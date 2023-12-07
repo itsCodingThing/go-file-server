@@ -1,0 +1,18 @@
+services:
+  go-server:
+    container_name: go-file-server
+    build: .
+    working_dir: /app/go-file-server
+    environment:
+      - PORT=3001
+    ports:
+      - 3001:3001
+    volumes:
+      - ~/projects/go-file-server:/app/go-file-server
+      - ~/storage:/app/storage
+    networks:
+      - container-connect
+
+networks:
+  container-connect:
+    external: true
