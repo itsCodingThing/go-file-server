@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"go-file-server/db"
+	"go-file-server/db/sqlc"
 	"go-file-server/middleware"
 	"go-file-server/utils"
 	"os"
@@ -55,6 +57,13 @@ func upload(fiberCtx *fiber.Ctx) error {
 
 		return response.CreateJSONResponse(fiberCtx)
 	}
+
+	var url sqlc.CreateUrlParams
+	if err := fiberCtx.BodyParser(&url); err != nil {
+		return fiberCtx.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	db.Queries.CreateUrl(fiberCtx.Context(), url)
 
 	return response.CreateJSONResponse(fiberCtx)
 }

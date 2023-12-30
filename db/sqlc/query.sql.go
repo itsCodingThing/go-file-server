@@ -7,11 +7,41 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const createUrl = `-- name: CreateUrl :one
+INSERT INTO urls (id, filename, url, path) VALUES ($1, $2, $3, $4) RETURNING id, filename, url
+`
+
+type CreateUrlParams struct {
+	ID       pgtype.Int4
+	Filename pgtype.Text
+	Url      pgtype.Text
+	Path     pgtype.Text
+}
+
+type CreateUrlRow struct {
+	ID       pgtype.Int4
+	Filename pgtype.Text
+	Url      pgtype.Text
+}
+
+func (q *Queries) CreateUrl(ctx context.Context, arg CreateUrlParams) (CreateUrlRow, error) {
+	row := q.db.QueryRow(ctx, createUrl,
+		arg.ID,
+		arg.Filename,
+		arg.Url,
+		arg.Path,
+	)
+	var i CreateUrlRow
+	err := row.Scan(&i.ID, &i.Filename, &i.Url)
+	return i, err
+}
+
 const listUrls = `-- name: ListUrls :many
-SELECT id, filename, url, path FROM urls
-ORDER BY filename
+SELECT id, filename, url, path FROM urls ORDER BY filename
 `
 
 func (q *Queries) ListUrls(ctx context.Context) ([]Url, error) {
