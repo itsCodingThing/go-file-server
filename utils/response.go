@@ -26,11 +26,3 @@ func (response *Response) CreateJSONResponse(ctx *fiber.Ctx) error {
 
 	return ctx.Status(response.StatusCode).JSON(response)
 }
-
-/*
-	 func (res *Response) CreateJSONResponse(w http.ResponseWriter) error {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(res.StatusCode)
-		return json.NewEncoder(w).Encode(res.Data)
-	}
-*/

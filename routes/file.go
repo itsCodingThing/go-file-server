@@ -1,13 +1,8 @@
 package routes
 
 import (
-	"go-file-server/db"
-	"go-file-server/db/sqlc"
 	"go-file-server/middleware"
 	"go-file-server/utils"
-	"os"
-	"strconv"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -28,29 +23,16 @@ func upload(fiberCtx *fiber.Ctx) error {
 		return response.CreateJSONResponse(fiberCtx)
 	}
 
-	filename := strings.ReplaceAll(strings.Trim(file.Filename, " "), " ", "")
-	fileSize := utils.BytesToMegabytes(file.Size)
-	response.Data = filename
-
-	storagePath := os.Getenv("STORAGE")
-	storageSize, _ := strconv.Atoi(os.Getenv("STORAGE_SIZE"))
-
-	dicSize, sizeErr := utils.GetFolderSize(storagePath)
-	if sizeErr != nil {
-		response.Msg = "unable to calculate directory size"
+	filepath, err := utils.VeriyStorageAndRetrievePath(file.Filename, file.Size)
+	if err != nil {
+		response.Msg = "error during saving file"
 		response.StatusCode = fiber.StatusInternalServerError
 
 		return response.CreateJSONResponse(fiberCtx)
 	}
 
-	if dicSize+fileSize > float64(storageSize) {
-		response.Msg = "storage size exceeded"
-		response.StatusCode = fiber.StatusInternalServerError
-
-		return response.CreateJSONResponse(fiberCtx)
-	}
-
-	savingErr := fiberCtx.SaveFile(file, storagePath+filename)
+	response.Data = file.Filename
+	savingErr := fiberCtx.SaveFile(file, filepath)
 	if savingErr != nil {
 		response.Msg = "error during saving file"
 		response.StatusCode = fiber.StatusInternalServerError
@@ -58,12 +40,18 @@ func upload(fiberCtx *fiber.Ctx) error {
 		return response.CreateJSONResponse(fiberCtx)
 	}
 
-	var url sqlc.CreateUrlParams
-	if err := fiberCtx.BodyParser(&url); err != nil {
-		return fiberCtx.Status(fiber.StatusBadRequest).SendString(err.Error())
-	}
+	// var url sqlc.CreateUrlParams
+	// if err := fiberCtx.BodyParser(&url); err != nil {
+	// 	return fiberCtx.Status(fiber.StatusBadRequest).SendString(err.Error())
+	// }
 
-	db.Queries.CreateUrl(fiberCtx.Context(), url)
+	// _, err = db.Queries.CreateUrl(fiberCtx.Context(), url)
+	// if err != nil {
+	// 	response.Msg = "error during saving to database"
+	// 	response.StatusCode = fiber.StatusInternalServerError
+
+	// 	return response.CreateJSONResponse(fiberCtx)
+	// }
 
 	return response.CreateJSONResponse(fiberCtx)
 }

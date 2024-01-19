@@ -1,6 +1,6 @@
-create table urls (
-    id int,
-    filename varchar(100),
-    url varchar(300),
-    path varchar(300)
+CREATE TABLE urls (
+    id INT,
+    filename VARCHAR(100),
+    url VARCHAR(300),
+    path VARCHAR(300)
 );

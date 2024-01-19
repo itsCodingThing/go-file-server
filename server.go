@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"os"
+
 	"go-file-server/db"
 	"go-file-server/routes"
 	"go-file-server/utils"
-	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -24,6 +25,7 @@ func main() {
 	}))
 
 	apiV1 := app.Group("/api/v1")
+
 	routes.PublicRoutes(apiV1)
 	routes.FileRoutes(apiV1)
 
