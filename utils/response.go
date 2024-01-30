@@ -6,9 +6,9 @@ import (
 
 // Response struct represents a Response object
 type Response struct {
-	Msg        string      `json:"msg"`
-	StatusCode int         `json:"statusCode"`
-	Data       interface{} `json:"data"`
+	Msg        string `json:"msg"`
+	StatusCode int    `json:"statusCode"`
+	Data       any    `json:"data"`
 }
 
 func (response *Response) CreateJSONResponse(ctx *fiber.Ctx) error {
